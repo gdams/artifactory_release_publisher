@@ -35,16 +35,39 @@ for (let java_version of java_versions) {
       let major_version = release.version
       let link = release.binary_link
 
-      let properties = `VERSION=${version}\n` +
-        `JVM=${jvm}\n` +
-        `ARCHITECTURE=${architecture}\n` +
-        `MAJOR_VERSION=${major_version}\n` +
-        `LINK=${link}`
+      let formattedArch = architecture;
 
-      fs.writeFile(`${architecture}-${jvm}-${version}.properties`, properties, (err) => {
-        // throws an error, you could also catch it here
-        if (err) throw err;
-      });
+      if (architecture == "x64") {
+        formattedArch = "x86_64"
+      }
+
+      if (architecture == "arm") {
+        console.log("skipping on arm as not supported right now")
+      } else {
+
+        var options = {
+          method: 'GET',
+          url: `https://adoptopenjdk.jfrog.io/adoptopenjdk/api/storage/rpm/centos/7/${formattedArch}/Packages/adoptopenjdk-${major_version}-${jvm}-${version.replace(/_/g, ".")}-1.${formattedArch}.rpm`,
+        };
+
+        request(options, function(error, response, body) {
+          if (error) throw new Error(error);
+
+          if (response.statusCode == 404) {
+
+            let properties = `VERSION=${version}\n` +
+              `JVM=${jvm}\n` +
+              `ARCHITECTURE=${architecture}\n` +
+              `MAJOR_VERSION=${major_version}\n` +
+              `LINK=${link}`
+
+            fs.writeFile(`${architecture}-${jvm}-${version}.properties`, properties, (err) => {
+              // throws an error, you could also catch it here
+              if (err) throw err;
+            });
+          }
+        });
+      }
     }
   });
 }
