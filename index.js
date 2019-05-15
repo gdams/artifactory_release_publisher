@@ -21,7 +21,8 @@ for (let java_version of java_versions) {
     url: `https://api.adoptopenjdk.net/v2/latestAssets/releases/${java_version}`,
     qs: {
       os: 'linux',
-      heap_size: 'normal'
+      heap_size: 'normal',
+      type: 'jdk'
     },
   };
 
@@ -32,7 +33,7 @@ for (let java_version of java_versions) {
       let jvm = release.openjdk_impl
       let architecture = release.architecture
       let major_version = release.version
-      let link = release.release_link
+      let link = release.binary_link
 
       let properties = `VERSION=${version}\n` +
         `JVM=${jvm}\n` +
