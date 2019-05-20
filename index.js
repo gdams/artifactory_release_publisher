@@ -68,7 +68,7 @@ for (let java_version of java_versions) {
               `LINK=${link}\n` +
               `TYPE=${type}`
 
-            fs.writeFile(`${architecture}-${jvm}-${version}.properties`, properties, (err) => {
+            fs.writeFile(`${architecture}-${jvm}-${version}-${type}.properties`, properties, (err) => {
               // throws an error, you could also catch it here
               if (err) throw err;
             });
