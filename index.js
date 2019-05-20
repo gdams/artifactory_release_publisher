@@ -21,8 +21,7 @@ for (let java_version of java_versions) {
     url: `https://api.adoptopenjdk.net/v2/latestAssets/releases/${java_version}`,
     qs: {
       os: 'linux',
-      heap_size: 'normal',
-      type: 'jdk'
+      heap_size: 'normal'
     },
   };
 
@@ -34,11 +33,18 @@ for (let java_version of java_versions) {
       let architecture = release.architecture
       let major_version = release.version
       let link = release.binary_link
+      let type = release.binary_type
 
       let formattedArch = architecture;
 
       if (architecture == "x64") {
         formattedArch = "x86_64"
+      }
+
+      if (type == "jre") {
+        formattedType = "-jre-"
+      } else {
+        formattedType = ""
       }
 
       if (architecture == "arm") {
@@ -47,7 +53,7 @@ for (let java_version of java_versions) {
 
         var options = {
           method: 'GET',
-          url: `https://adoptopenjdk.jfrog.io/adoptopenjdk/api/storage/rpm/centos/7/${formattedArch}/Packages/adoptopenjdk-${major_version}-${jvm}-${version.replace(/_/g, ".")}-1.${formattedArch}.rpm`,
+          url: `https://adoptopenjdk.jfrog.io/adoptopenjdk/api/storage/rpm/centos/7/${formattedArch}/Packages/adoptopenjdk-${major_version}-${jvm}${formattedType}-${version.replace(/_/g, ".")}-1.${formattedArch}.rpm`,
         };
 
         request(options, function(error, response, body) {
@@ -59,7 +65,8 @@ for (let java_version of java_versions) {
               `JVM=${jvm}\n` +
               `ARCHITECTURE=${architecture}\n` +
               `MAJOR_VERSION=${major_version}\n` +
-              `LINK=${link}`
+              `LINK=${link}\n` +
+              `TYPE=${type}`
 
             fs.writeFile(`${architecture}-${jvm}-${version}.properties`, properties, (err) => {
               // throws an error, you could also catch it here
